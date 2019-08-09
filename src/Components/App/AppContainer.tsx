@@ -4,4 +4,4 @@ import { IS_LOGGED_IN } from "./AppQueries";
 
 const AppContainer = () => <div>Stuff</div>;
 
-export default graphql(ISLOGGED_IN)(AppContainer);
+export default graphql(IS_LOGGED_IN)(AppContainer);
