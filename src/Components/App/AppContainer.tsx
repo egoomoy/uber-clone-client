@@ -1,7 +1,14 @@
 import React from "react";
 import { graphql } from "react-apollo";
+import theme from "../../theme";
+import { ThemeProvider } from "../../typed-componets";
+import AppPresenter from "./AppPresenter";
 import { IS_LOGGED_IN } from "./AppQueries";
 
-const AppContainer = () => <div>Stufff</div>;
+const AppContainer = ({ data }) => (
+  <ThemeProvider them={theme}>
+    <AppPresenter isLoggedIn={data.auth.isLoggedIn} />
+  </ThemeProvider>
+);
 
 export default graphql(IS_LOGGED_IN)(AppContainer);
