@@ -1,13 +1,25 @@
 import { useMutation } from "@apollo/react-hooks";
-import React from "react";
+import React, { useReducer } from "react";
 import { RouteComponentProps } from "react-router-dom";
 import { toast } from "react-toastify";
-import useInputs from "../../utill/useInputs";
+// import {
+//   startPhoneVerification,
+//   startPhoneVerificationVariables
+// } from "../../types/api";
 import PhoneLoginPresenter from "./PhoneLoginPresenter";
 import { PHONE_SIGN_IN } from "./PhoneQueries";
+// tslint:disable-next-line: comment-format
+//input hooks에 대해서 생각해 볼 것
+
+function reducer(state, action) {
+  return {
+    ...state,
+    [action.name]: action.value
+  };
+}
 
 const PhoneLoginContainer: React.FC<RouteComponentProps> = ({ history }) => {
-  const [state, onChange] = useInputs({
+  const [state, dispatch] = useReducer(reducer, {
     countryCode: "+82",
     phoneNumber: ""
   });
@@ -18,8 +30,10 @@ const PhoneLoginContainer: React.FC<RouteComponentProps> = ({ history }) => {
     PHONE_SIGN_IN,
     {
       onCompleted({ StartPhoneVerification }) {
+        // console.log(mutationLoading);
         const { ok, error } = StartPhoneVerification;
         if (ok === false) {
+          toast.success("SMS Sent! Redirecting you...");
           setTimeout(() => {
             history.push({
               pathname: "/verify-phone",
@@ -28,9 +42,9 @@ const PhoneLoginContainer: React.FC<RouteComponentProps> = ({ history }) => {
               }
             });
           }, 2000);
+
           toast.error(`${error}`);
         } else if (ok) {
-          toast.success("SMS Sent! Redirecting you...");
           return;
         }
       },
@@ -39,6 +53,19 @@ const PhoneLoginContainer: React.FC<RouteComponentProps> = ({ history }) => {
       }
     }
   );
+
+  const onInputChange: React.ChangeEventHandler<
+    HTMLInputElement | HTMLSelectElement
+  > = e => {
+    dispatch(e.target);
+  };
+
+  // const onSubmit: React.FormEventHandler<HTMLFormElement> = event => {
+  //   event.preventDefault();
+  //   PhoneSignMutation({});
+
+  //   toast.error("TESTING....SUBMIT...");
+  // };
 
   const onSubmit: React.FormEventHandler<HTMLFormElement> = event => {
     event.preventDefault();
@@ -60,7 +87,7 @@ const PhoneLoginContainer: React.FC<RouteComponentProps> = ({ history }) => {
       <PhoneLoginPresenter
         countryCode={countryCode}
         phoneNumber={phoneNumber}
-        onInputChange={onChange}
+        onInputChange={onInputChange}
         onSubmit={onSubmit}
         loading={mutationLoading}
       />
